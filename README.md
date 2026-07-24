@@ -26,7 +26,7 @@ docker compose up -d --build
 
 Esto construye la imagen (PHP + Composer + extensión SQLite) y dos servicios:
 
-- **app** — contenedor con el proyecto Laravel montado en `./backend`.
+- **app** — Laravel sirviendo en [http://localhost:8000](http://localhost:8000) (`php artisan serve`).
 - **db-viewer** — visor web de la base de datos SQLite en [http://localhost:8080](http://localhost:8080) ([coleifer/sqlite-web](https://github.com/coleifer/sqlite_web)).
 
 ## Comandos útiles
@@ -35,6 +35,9 @@ Esto construye la imagen (PHP + Composer + extensión SQLite) y dos servicios:
 # Correr las migraciones
 docker compose exec app php artisan migrate
 
+# Cargar datos de ejemplo (3 usuarios, 3 equipos) para probar la API
+docker compose exec app php artisan db:seed
+
 # Correr la suite de pruebas
 docker compose exec app php artisan test
 
@@ -42,6 +45,23 @@ docker compose exec app php artisan test
 docker compose exec app php artisan <comando>
 docker compose exec app composer <comando>
 ```
+
+## API para probar en Postman (no forma parte de los casos de uso evaluados; es solo una capa fina sobre `GestorPrestamos` para poder demostrar el sistema)
+
+Base URL: `http://localhost:8000/api`. Corre `php artisan db:seed` primero para tener usuarios (ids
+1-3) y equipos (ids 1-3) de ejemplo.
+
+| Método | Ruta | Body (JSON) | Caso de uso |
+|---|---|---|---|
+| `POST` | `/prestamos` | `{"usuario_id": 1, "equipo_id": 1, "dias": 7}` | UC1 — Registrar Préstamo |
+| `POST` | `/prestamos/{id}/devolucion` | `{"danado": false}` | UC2 — Registrar Devolución |
+| `GET` | `/prestamos/activos` | — | UC3 — Consultar Historial |
+
+Respuestas de error (usuario no habilitado, equipo no disponible, préstamo inexistente) devuelven
+`422` con `{"error": "..."}`. Si un préstamo devuelto estaba atrasado, se registra un aviso en
+`storage/logs/laravel.log` vía `LogNotificador` (una segunda implementación de `NotificadorAtraso`
+distinta de `ConsolaNotificador` — demuestra que se puede agregar un canal nuevo sin tocar
+`GestorPrestamos`).
 
 ## Estructura
 
@@ -56,8 +76,11 @@ prestamo-equipos/
     │   ├── Enums/               # RolUsuario, EstadoEquipo, EstadoPrestamo
     │   ├── Repositories/        # UsuarioRepository, EquipoRepository, PrestamoRepository
     │   ├── Services/            # GestorPrestamos (orquesta los 3 casos de uso)
-    │   └── Notifiers/           # NotificadorAtraso (interfaz) + ConsolaNotificador — patrón Observer
+    │   ├── Notifiers/           # NotificadorAtraso (interfaz), ConsolaNotificador, LogNotificador — patrón Observer
+    │   └── Http/Controllers/    # PrestamoController — capa fina de API para demos (no evaluada)
+    ├── routes/api.php           # POST /prestamos, POST /prestamos/{id}/devolucion, GET /prestamos/activos
     ├── database/migrations/     # usuarios, equipos, prestamos
+    ├── database/seeders/        # datos de ejemplo para probar la API
     └── tests/Feature/           # 15 pruebas: 1 archivo por caso de uso + patrón Observer
 ```
 
