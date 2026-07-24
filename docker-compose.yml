@@ -1,0 +1,19 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    working_dir: /app
+    volumes:
+      - ./backend:/app
+    command: ["tail", "-f", "/dev/null"]
+
+  db-viewer:
+    image: coleifer/sqlite-web
+    restart: unless-stopped
+    environment:
+      SQLITE_DATABASE: database.sqlite
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./backend/database:/data
