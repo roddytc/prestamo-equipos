@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="color-scheme" content="light">
+<title>Informe de Diagnóstico — Fase 2</title>
+<style>
+  @page { size: A4; margin: 20mm 18mm; }
+  * { box-sizing: border-box; }
+  html { color-scheme: light; background: #ffffff; }
+  body {
+    font-family: 'Calibri', 'Segoe UI', Arial, sans-serif;
+    color: #222;
+    background: #ffffff;
+    line-height: 1.45;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    font-size: 15px;
+  }
+  h1, h2, h3 { color: #7a1f2b; font-family: 'Cambria', Georgia, serif; }
+  h1 { font-size: 26px; border-bottom: 3px solid #7a1f2b; padding-bottom: 8px; }
+  h2 { font-size: 19px; margin-top: 36px; border-bottom: 1px solid #ccc; padding-bottom: 4px; }
+  h3 { font-size: 15px; margin-top: 16px; }
+  .cover {
+    text-align: center;
+    padding-top: 90px;
+    page-break-after: always;
+  }
+  .cover h1 { border: none; font-size: 30px; margin-bottom: 4px; }
+  .cover .subtitle { font-size: 18px; color: #444; margin-bottom: 50px; }
+  .cover table {
+    margin: 40px auto 0 auto;
+    border-collapse: collapse;
+    width: 90%;
+  }
+  .cover table td { border: 1px solid #ccc; padding: 10px 14px; text-align: left; font-size: 14px; }
+  .cover table td.k { background: #7a1f2b; color: #fff; font-weight: bold; width: 220px; }
+  .fill { background: #fff3cd; padding: 1px 6px; border: 1px dashed #b38600; font-style: italic; }
+  section.smell { page-break-before: always; }
+  section.smell:first-of-type { page-break-before: auto; }
+  .meta {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 10px 0 16px 0;
+  }
+  .badge {
+    background: #7a1f2b;
+    color: #fff;
+    padding: 4px 12px;
+    border-radius: 3px;
+    font-size: 12.5px;
+    font-weight: bold;
+  }
+  .badge.alt { background: #555; }
+  .loc {
+    font-family: 'Consolas', monospace;
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 13.5px;
+  }
+  .capture {
+    background: #1e1e1e;
+    color: #d4d4d4;
+    border-radius: 6px;
+    padding: 14px 16px;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 12.5px;
+    line-height: 1.55;
+    white-space: pre-wrap;
+    word-break: break-word;
+    margin: 10px 0 16px 0;
+    page-break-inside: avoid;
+  }
+  .capture .ln { color: #6a6a6a; user-select: none; display: inline-block; width: 28px; }
+  .capture .hl { background: rgba(255,255,0,0.12); display: block; }
+  .kw { color: #569cd6; }
+  .fn { color: #dcdcaa; }
+  .cls { color: #4ec9b0; }
+  .str { color: #ce9178; }
+  .cmt { color: #6a9955; }
+  table.spec { border-collapse: collapse; width: 100%; margin: 10px 0 18px 0; font-size: 13.5px; }
+  table.spec th { background: #7a1f2b; color: #fff; padding: 6px 8px; text-align: left; }
+  table.spec td { border: 1px solid #ddd; padding: 6px 8px; }
+  .note {
+    background: #f7ecec;
+    border-left: 4px solid #7a1f2b;
+    padding: 10px 14px;
+    margin: 14px 0;
+    font-size: 14px;
+  }
+  code { background: #f0f0f0; padding: 1px 5px; border-radius: 3px; font-size: 13px; }
+  footer { margin-top: 40px; font-size: 11px; color: #888; text-align: center; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <div style="font-size:13px;color:#666;letter-spacing:1px;">UNIVERSIDAD ESPÍRITU SANTO — FACULTAD DE INGENIERÍA</div>
+  <div style="font-size:13px;color:#666;margin-bottom:30px;">Carrera de Ingeniería en Computación · Diseño de Software (UCOM0310) · PEL 3 – 2026</div>
+
+  <h1>Informe de Diagnóstico</h1>
+  <div class="subtitle">Fase 2 — Código base y catálogo de malos olores</div>
+
+  <div style="font-size:22px; color:#333; margin-top:60px; font-family: 'Cambria', Georgia, serif;">
+    Sistema de Préstamo de Equipos Tecnológicos
+  </div>
+  <div style="font-size:15px; color:#666; margin-top:6px;">Dominio D3 — Laravel 13 + SQLite</div>
+
+  <table>
+    <tr><td class="k">Estudiante</td><td>roddytc</td></tr>
+    <tr><td class="k">Docente</td><td>Victoria García Velásquez, MGP.</td></tr>
+    <tr><td class="k">Repositorio</td><td>github.com/roddytc/prestamo-equipos</td></tr>
+    <tr><td class="k">Entrega</td><td>Fase 2 — Fin de semana 7</td></tr>
+    <tr><td class="k">Fecha</td><td>24 de julio de 2026</td></tr>
+  </table>
+</div>
+
+<section class="smell">
+<h2>Metodología</h2>
+<p>
+Tras completar la implementación funcional mínima de los 3 casos de uso (Registrar Préstamo,
+Registrar Devolución, Consultar Historial de Préstamos) con su suite de 15 pruebas unitarias en
+verde, se revisó manualmente el código propio en <code>app/Services</code> y
+<code>app/Repositories</code> — el núcleo de la lógica de negocio — buscando los malos olores
+clásicos de Fowler (método largo, clase grande, duplicación, parámetros problemáticos,
+condicionales complejos). Deliberadamente <strong>no se pulió el código antes de este diagnóstico</strong>:
+la primera versión se escribió priorizando que los casos de uso funcionaran y las pruebas
+pasaran, tal como ocurre en una iteración real de desarrollo. Los 5 hallazgos siguientes son
+reales — no fueron insertados a propósito — y quedan documentados aquí para corregirse en la
+Fase 3 mediante refactorización, no antes.
+</p>
+<table class="spec">
+<tr><th>#</th><th>Mal olor</th><th>Nivel (Fase 3)</th><th>Ubicación</th></tr>
+<tr><td>1</td><td>Código duplicado entre repositorios</td><td>Clases y objetos</td><td><span class="loc">UsuarioRepository.php, EquipoRepository.php</span></td></tr>
+<tr><td>2</td><td>Validación "buscar → lanzar excepción" duplicada</td><td>Métodos</td><td><span class="loc">GestorPrestamos.php:37-47, 69-70</span></td></tr>
+<tr><td>3</td><td>Método con múltiples responsabilidades</td><td>Métodos</td><td><span class="loc">GestorPrestamos.php:32-63</span></td></tr>
+<tr><td>4</td><td>Parámetro booleano (flag argument)</td><td>Condicionales</td><td><span class="loc">GestorPrestamos.php:65, 73</span></td></tr>
+<tr><td>5</td><td>Data clump / obsesión primitiva</td><td>Datos</td><td><span class="loc">GestorPrestamos.php:32</span></td></tr>
+</table>
+</section>
+
+<section class="smell">
+<h2>1. Código duplicado entre repositorios</h2>
+<div class="meta"><span class="badge">Duplicación</span><span class="badge alt">Nivel: Clases y objetos</span></div>
+<p><strong>Ubicación:</strong> <span class="loc">app/Repositories/UsuarioRepository.php:9-17</span> y
+<span class="loc">app/Repositories/EquipoRepository.php:9-17</span> (el mismo patrón se repite en
+<span class="loc">PrestamoRepository.php</span>).</p>
+
+<div class="capture"><span class="ln">9</span> <span class="kw">public function</span> <span class="fn">buscar</span>(<span class="kw">int</span> $id): ?Usuario
+<span class="ln">10</span> {
+<span class="ln">11</span>     <span class="kw">return</span> Usuario::find($id);
+<span class="ln">12</span> }
+<span class="ln">13</span>
+<span class="ln">14</span> <span class="kw">public function</span> <span class="fn">guardar</span>(Usuario $usuario): <span class="kw">void</span>
+<span class="ln">15</span> {
+<span class="ln">16</span>     $usuario->save();
+<span class="ln">17</span> }</div>
+
+<p><strong>Por qué es un problema:</strong> <code>UsuarioRepository</code> y
+<code>EquipoRepository</code> son estructuralmente idénticos — solo cambia el nombre de la clase
+del modelo. Si mañana se decide agregar, por ejemplo, un método <code>existePor(string $campo)</code>
+común a los tres repositorios, habría que escribirlo y mantenerlo en tres archivos por separado.
+Es exactamente el escenario que Fowler describe como "si necesitas cambiar algo en más de un
+lugar, es una señal de diseño". Candidato para Fase 3: extraer una clase base genérica
+(<code>Repository</code>) de la que las tres hereden, o un método genérico apoyado en PHP
+templates/generics vía PHPDoc.</p>
+</section>
+
+<section class="smell">
+<h2>2. Validación "buscar → lanzar excepción" duplicada</h2>
+<div class="meta"><span class="badge">Duplicación</span><span class="badge alt">Nivel: Métodos</span></div>
+<p><strong>Ubicación:</strong> <span class="loc">app/Services/GestorPrestamos.php:37-47</span> y
+<span class="loc">GestorPrestamos.php:69-70</span>.</p>
+
+<div class="capture"><span class="ln">37</span> <span class="kw">if</span> (! $usuario || ! $equipo) {
+<span class="ln">38</span>     <span class="kw">throw new</span> OperacionInvalidaException(<span class="str">'Usuario o equipo no encontrado.'</span>);
+<span class="ln">39</span> }
+<span class="ln">40</span>
+<span class="ln">41</span> <span class="kw">if</span> (! $usuario->puedeSolicitarPrestamo()) {
+<span class="ln">42</span>     <span class="kw">throw new</span> OperacionInvalidaException(<span class="str">'El usuario no esta habilitado...'</span>);
+<span class="ln">43</span> }
+<span class="ln">44</span>
+<span class="ln">45</span> <span class="kw">if</span> (! $equipo->estaDisponible()) {
+<span class="ln">46</span>     <span class="kw">throw new</span> OperacionInvalidaException(<span class="str">'El equipo no esta disponible.'</span>);
+<span class="ln">47</span> }
+<span class="cmt">  ... (mismo patron: buscar → condicion → throw) reaparece en registrarDevolucion(), linea 69-70</span></div>
+
+<p><strong>Por qué es un problema:</strong> el patrón "busca una entidad, si no cumple una condición
+lanza <code>OperacionInvalidaException</code> con un mensaje" se repite con variaciones menores en
+<code>registrarPrestamo()</code> y <code>registrarDevolucion()</code>. No es código
+copy-paste idéntico, pero sí la misma <em>estructura</em> repetida — lo que Fowler llama
+duplicación "de esquema". Si se decide, por ejemplo, envolver estas excepciones con un código de
+error adicional, hay que recordar tocarlo en cada uno de los sitios donde aparece el patrón.
+Candidato para Fase 3: extraer un método privado de guarda, p. ej. <code>rechazarSi(bool
+$condicion, string $mensaje)</code>.</p>
+</section>
+
+<section class="smell">
+<h2>3. Método con múltiples responsabilidades: registrarPrestamo()</h2>
+<div class="meta"><span class="badge">Método largo</span><span class="badge alt">Nivel: Métodos</span></div>
+<p><strong>Ubicación:</strong> <span class="loc">app/Services/GestorPrestamos.php:32-63</span>.</p>
+
+<div class="capture"><span class="ln">32</span> <span class="kw">public function</span> <span class="fn">registrarPrestamo</span>(<span class="kw">int</span> $usuarioId, <span class="kw">int</span> $equipoId, <span class="kw">int</span> $dias): Prestamo
+<span class="ln">33</span> {
+<span class="ln">34</span>     $usuario = $this->usuarios->buscar($usuarioId);
+<span class="ln">35</span>     $equipo = $this->equipos->buscar($equipoId);
+<span class="ln">36</span>
+<span class="ln">37</span>     <span class="kw">if</span> (! $usuario || ! $equipo) {
+<span class="ln">38</span>         <span class="kw">throw new</span> OperacionInvalidaException(<span class="str">'Usuario o equipo no encontrado.'</span>);
+<span class="ln">39</span>     }
+<span class="ln">40</span>
+<span class="ln">41</span>     <span class="kw">if</span> (! $usuario->puedeSolicitarPrestamo()) { ... }
+<span class="ln">45</span>     <span class="kw">if</span> (! $equipo->estaDisponible()) { ... }
+<span class="ln">49</span>     $fechaPrestamo = Carbon::today();
+<span class="ln">51</span>     $prestamo = <span class="kw">new</span> Prestamo([ ...atributos... ]);
+<span class="ln">58</span>     $this->prestamos->guardar($prestamo);
+<span class="ln">60</span>     $equipo->cambiarEstado(EstadoEquipo::PRESTADO);
+<span class="ln">62</span>     <span class="kw">return</span> $prestamo;
+<span class="ln">63</span> }</div>
+<p style="font-size:12px;color:#777;margin-top:-10px;">(Bloques abreviados con "..." para caber en el informe; el archivo real no tiene comentarios adicionales — ver <span class="loc">GestorPrestamos.php:32-63</span> completo en el repositorio.)</p>
+
+<p><strong>Por qué es un problema:</strong> en 30 líneas, el método mezcla seis
+responsabilidades distintas (buscar, validar existencia, validar reglas de negocio, calcular
+fechas, construir/persistir, y mutar el estado de una entidad relacionada). Hoy es legible
+porque el caso de uso es simple, pero cada responsabilidad nueva (por ejemplo, una regla de
+negocio adicional) va a alargar el mismo método en vez de vivir en un lugar propio — el patrón
+clásico de crecimiento de un "long method". Candidato para Fase 3: Extract Method para separar
+la validación (<code>validarDisponibilidad(Usuario, Equipo)</code>) de la construcción/persistencia.</p>
+</section>
+
+<section class="smell">
+<h2>4. Parámetro booleano (flag argument) en registrarDevolucion()</h2>
+<div class="meta"><span class="badge">Condicional</span><span class="badge alt">Nivel: Condicionales</span></div>
+<p><strong>Ubicación:</strong> <span class="loc">app/Services/GestorPrestamos.php:65</span> (firma) y
+<span class="loc">línea 73</span> (uso).</p>
+
+<div class="capture"><span class="ln">65</span> <span class="kw">public function</span> <span class="fn">registrarDevolucion</span>(<span class="kw">int</span> $prestamoId, <span class="kw">bool</span> $danado = <span class="kw">false</span>): Prestamo
+<span class="ln">...</span>
+<span class="ln">73</span>     $prestamo->equipo->cambiarEstado($danado ? EstadoEquipo::DANADO : EstadoEquipo::DISPONIBLE);</div>
+
+<p><strong>Por qué es un problema:</strong> <code>$danado</code> es un parámetro booleano que
+cambia el comportamiento interno del método (qué estado final recibe el equipo). Robert C.
+Martin lo señala explícitamente en <em>Clean Code</em>: un parámetro bandera es indicio de que el
+método en realidad hace <em>dos cosas</em> ("registrar una devolución normal" y "registrar una
+devolución con equipo dañado") disfrazadas de una sola firma. Además, en el sitio de la llamada
+(<code>registrarDevolucion($id, true)</code>) el significado de <code>true</code> no es
+autoexplicativo sin mirar la firma del método. Candidato para Fase 3 (nivel condicionales):
+reemplazar el flag por dos métodos explícitos, o por un objeto de caso especial
+(<code>Replace Parameter with Explicit Methods</code> / <code>Introduce Special Case</code>).</p>
+</section>
+
+<section class="smell">
+<h2>5. Data clump / obsesión primitiva en los parámetros de registrarPrestamo()</h2>
+<div class="meta"><span class="badge">Datos</span><span class="badge alt">Nivel: Datos</span></div>
+<p><strong>Ubicación:</strong> <span class="loc">app/Services/GestorPrestamos.php:32</span>.</p>
+
+<div class="capture"><span class="ln">32</span> <span class="kw">public function</span> <span class="fn">registrarPrestamo</span>(<span class="kw">int</span> $usuarioId, <span class="kw">int</span> $equipoId, <span class="kw">int</span> $dias): Prestamo</div>
+
+<p><strong>Por qué es un problema:</strong> <code>$usuarioId</code>, <code>$equipoId</code> y
+<code>$dias</code> son tres primitivos sueltos que siempre viajan juntos para representar un
+mismo concepto: "una solicitud de préstamo". Es el "Data Clump" de Fowler — cuando los mismos
+datos aparecen agrupados una y otra vez, probablemente deberían ser su propio objeto. Hoy son
+solo 3 parámetros y parece inofensivo, pero si el caso de uso creciera (por ejemplo, agregando
+una fecha de inicio distinta a "hoy", u observaciones del encargado), este método terminaría con
+una lista de parámetros cada vez más larga en vez de un solo objeto de entrada. Candidato para
+Fase 3 (nivel datos): introducir un objeto de valor <code>SolicitudPrestamo</code> (Introduce
+Parameter Object).</p>
+</section>
+
+<footer>
+Informe de diagnóstico — Fase 2. Sistema de Préstamo de Equipos Tecnológicos (Dominio D3). Diseño de Software, UCOM0310.
+</footer>
+
+</body>
+</html>
