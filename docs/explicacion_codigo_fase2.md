@@ -263,20 +263,70 @@ desde la base de datos (por si el objeto en memoria quedó desactualizado).
 
 ---
 
-## 9. Cómo correr todo (chuleta de comandos)
+## 9. La API — `routes/api.php` + `app/Http/Controllers/PrestamoController.php`
+
+Esto se agregó **después** de la entrega de Fase 2, a pedido propio, para poder demostrar el
+sistema en vivo con Postman en vez de solo con pruebas automatizadas. **No es parte de los casos
+de uso evaluados** — es una capa delgada encima de `GestorPrestamos`, útil para la sustentación.
+
+```php
+class PrestamoController extends Controller
+{
+    public function __construct(private GestorPrestamos $gestor)
+    {
+        $this->gestor->agregarObservador(new LogNotificador());
+    }
+
+    public function store(Request $request): JsonResponse
+    {
+        $data = $request->validate([...]);
+        try {
+            $prestamo = $this->gestor->registrarPrestamo(...);
+        } catch (OperacionInvalidaException $e) {
+            return response()->json(['error' => $e->getMessage()], 422);
+        }
+        return response()->json($prestamo->load('usuario', 'equipo'), 201);
+    }
+    // devolucion() y activos() siguen el mismo patron
+}
+```
+
+Puntos clave si preguntan por esto:
+
+- **Laravel resuelve `GestorPrestamos` solo:** como el constructor del controlador pide un
+  `GestorPrestamos` por tipo, el contenedor de servicios de Laravel lo crea automáticamente (y a
+  su vez crea los 3 repositorios que `GestorPrestamos` pide) — no hay ningún código nuestro que
+  arme esa cadena a mano. Esto es "autowiring"/inyección de dependencias, una consecuencia directa
+  de que todo el diseño ya dependía de tipos concretos con constructores simples.
+- **`LogNotificador` es una segunda implementación real de `NotificadorAtraso`** (además de
+  `ConsolaNotificador`, que ya existía desde antes). Escribe en `storage/logs/laravel.log` con
+  `Log::warning()` en vez de `echo`, porque un `echo` dentro de un controlador HTTP se mezclaría
+  con la respuesta JSON y la rompería. Este es exactamente el escenario que el documento de diseño
+  (sección 5) anticipó: "agregar `EmailNotificador` en el futuro no requeriría tocar una sola línea
+  de `GestorPrestamos`" — aquí se cumplió esa promesa con un canal distinto (log en vez de email),
+  sin tocar `GestorPrestamos` para nada.
+- **Los errores de negocio se traducen a HTTP 422**, no a un error 500 crudo: cada `catch
+  (OperacionInvalidaException $e)` en el controlador convierte la excepción de dominio en una
+  respuesta JSON controlada (`{"error": "..."}`) con código 422 ("Unprocessable Entity").
+
+---
+
+## 10. Cómo correr todo (chuleta de comandos)
 
 ```bash
 docker compose up -d --build      # levantar los contenedores
 docker compose exec app php artisan migrate     # crear las tablas
+docker compose exec app php artisan db:seed     # cargar datos de ejemplo (3 usuarios, 3 equipos)
 docker compose exec app php artisan test        # correr las 15 pruebas
 docker compose exec app php artisan tinker       # consola interactiva de Laravel, para probar código suelto
 ```
 
-`http://localhost:8080` abre el visor de la base de datos SQLite.
+`http://localhost:8000/api/...` sirve la API. `http://localhost:8080` abre el visor de la base de
+datos SQLite.
 
 ---
 
-## 10. Lo que cuenta el historial de Git
+## 11. Lo que cuenta el historial de Git
 
 Los commits siguen el orden real de construcción: documento de diseño → infraestructura Docker →
 scaffold de Laravel → entidades de dominio → repositorios → Observer → `GestorPrestamos` → un

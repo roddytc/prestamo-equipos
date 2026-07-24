@@ -98,3 +98,15 @@ reglas de negocio.
 Para cualquier línea que señale, ten el hábito de responder en este orden: **(1)** qué hace en una
 frase, **(2)** por qué está ahí (qué caso de uso o regla de negocio soporta), **(3)** qué pasaría
 si no estuviera. Ese orden demuestra dominio real, no memorización.
+
+### 11. Veo una API/`PrestamoController` en tu repo, ¿eso qué es?
+
+Se agregó **después** de entregada la Fase 2, por iniciativa propia, para poder demostrar el
+sistema con Postman durante la sustentación en lugar de solo mostrar pruebas automatizadas — no es
+parte de los casos de uso evaluados ni cambia el diseño. Es una capa delgada: el controlador solo
+recibe la petición HTTP, llama al método correspondiente de `GestorPrestamos`, y traduce el
+resultado (o la excepción `OperacionInvalidaException`) a una respuesta JSON. Toda la lógica de
+negocio real sigue viviendo exclusivamente en `GestorPrestamos` — el controlador no valida ni
+decide nada por su cuenta. De paso agrega `LogNotificador`, una segunda implementación de
+`NotificadorAtraso` (ver pregunta 2) que demuestra en código real la promesa de extensibilidad del
+patrón Observer.
