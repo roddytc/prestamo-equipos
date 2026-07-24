@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 430" font-family="Segoe UI, Arial, sans-serif">
+  <style>
+    .life { stroke: #555; stroke-width: 1; stroke-dasharray: 3,3; }
+    .box { fill: #f7ecec; stroke: #7a1f2b; stroke-width: 1.5; }
+    .title { font-size: 12px; fill: #222; text-anchor: middle; font-weight: bold; }
+    .msg { stroke: #333; stroke-width: 1.3; fill: none; marker-end: url(#a3); }
+    .ret { stroke: #333; stroke-width: 1.1; fill: none; stroke-dasharray: 4,3; marker-end: url(#a3); }
+    .mtext { font-size: 11px; fill: #222; text-anchor: middle; }
+    .frame { fill: none; stroke: #444; stroke-width: 1.2; }
+    .tag { fill: #eee; stroke: #444; stroke-width: 1.2; }
+    .tagtext { font-size: 11px; fill: #222; font-weight: bold; }
+    .guard { font-size: 11px; fill: #222; font-style: italic; }
+    .divider { stroke: #444; stroke-width: 1; stroke-dasharray: 4,3; }
+  </style>
+  <defs>
+    <marker id="a3" markerWidth="9" markerHeight="9" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#333"/>
+    </marker>
+  </defs>
+
+  <text x="450" y="20" font-size="15" font-weight="bold" text-anchor="middle">Secuencia: Registrar Devolucion</text>
+
+  <g>
+    <rect x="15" y="35" width="110" height="26" class="box"/>
+    <text x="70" y="52" class="title">Encargado</text>
+    <line x1="70" y1="61" x2="70" y2="415" class="life"/>
+
+    <rect x="170" y="35" width="140" height="26" class="box"/>
+    <text x="240" y="52" class="title">GestorPrestamos</text>
+    <line x1="240" y1="61" x2="240" y2="415" class="life"/>
+
+    <rect x="360" y="35" width="150" height="26" class="box"/>
+    <text x="435" y="52" class="title">PrestamoRepository</text>
+    <line x1="435" y1="61" x2="435" y2="415" class="life"/>
+
+    <rect x="560" y="35" width="140" height="26" class="box"/>
+    <text x="630" y="52" class="title">EquipoRepository</text>
+    <line x1="630" y1="61" x2="630" y2="415" class="life"/>
+
+    <rect x="750" y="35" width="140" height="26" class="box"/>
+    <text x="820" y="52" class="title">NotificadorAtraso</text>
+    <line x1="820" y1="61" x2="820" y2="415" class="life"/>
+  </g>
+
+  <line x1="70" y1="90" x2="240" y2="90" class="msg"/>
+  <text x="155" y="83" class="mtext">registrarDevolucion(prestamoId, danado?)</text>
+
+  <line x1="240" y1="112" x2="435" y2="112" class="msg"/>
+  <text x="337" y="106" class="mtext">buscar(prestamoId)</text>
+  <line x1="435" y1="130" x2="240" y2="130" class="ret"/>
+  <text x="337" y="124" class="mtext">prestamo</text>
+
+  <line x1="240" y1="152" x2="435" y2="152" class="msg"/>
+  <text x="337" y="146" class="mtext">actualizar(fechaDevReal, estado=DEVUELTO)</text>
+
+  <!-- alt frame: danado / else -->
+  <g>
+    <rect x="225" y="170" width="420" height="90" class="frame"/>
+    <polygon points="225,170 265,170 265,184 257,192 225,192" class="tag"/>
+    <text x="233" y="185" class="tagtext">alt</text>
+    <text x="285" y="185" class="guard">[danado = true]</text>
+
+    <line x1="240" y1="210" x2="630" y2="210" class="msg"/>
+    <text x="435" y="204" class="mtext">cambiarEstado(DANADO)</text>
+
+    <line x1="225" y1="222" x2="645" y2="222" class="divider"/>
+    <text x="233" y="237" class="guard">[else]</text>
+
+    <line x1="240" y1="250" x2="630" y2="250" class="msg"/>
+    <text x="435" y="244" class="mtext">cambiarEstado(DISPONIBLE)</text>
+  </g>
+
+  <!-- opt frame: notificacion de atraso -->
+  <g>
+    <rect x="225" y="280" width="615" height="70" class="frame"/>
+    <polygon points="225,280 265,280 265,294 257,302 225,302" class="tag"/>
+    <text x="233" y="295" class="tagtext">opt</text>
+    <text x="285" y="295" class="guard">[prestamo.estaAtrasado()]</text>
+
+    <line x1="240" y1="325" x2="820" y2="325" class="msg"/>
+    <text x="530" y="319" class="mtext">notificar(prestamo)</text>
+  </g>
+
+  <line x1="240" y1="378" x2="70" y2="378" class="ret"/>
+  <text x="155" y="372" class="mtext">confirmacion de devolucion</text>
+</svg>
