@@ -39,13 +39,13 @@ clase nueva (`EmailNotificador implements NotificadorAtraso`) sin tocar `GestorP
 | **OCP** | Se agregan nuevos canales de notificación (o nuevos tipos de repositorio) sin modificar `GestorPrestamos`. |
 | **LSP** | Cualquier implementación de `NotificadorAtraso` (consola, email futuro) debe poder sustituir a otra sin romper el comportamiento que `GestorPrestamos` espera. |
 | **ISP** | `NotificadorAtraso` tiene un solo método — ninguna implementación se ve forzada a implementar algo que no usa. |
-| **DIP** | `GestorPrestamos` depende de abstracciones (interfaces de repositorio y de notificador), no de clases concretas — por eso el almacenamiento en memoria se puede cambiar a una base de datos real sin tocar la lógica de negocio. |
+| **DIP** | `GestorPrestamos` depende de abstracciones (interfaces de repositorio y de notificador), no de clases concretas — por eso el motor de persistencia (hoy SQLite vía Eloquent) se podría cambiar por otro (MySQL, Postgres) sin tocar la lógica de negocio. |
 
 ### 4. ¿Cómo se refleja el modelo 4+1 en este proyecto?
 
 Resume las 5 vistas del documento (sección 1): escenarios (casos de uso) amarra a lógica (clases),
-procesos (un solo hilo, síncrono), desarrollo (carpetas `models/repositories/services/notifiers`)
-y física (un proceso Node/TS, en memoria). La clave a transmitir: **cada vista responde a la misma
+procesos (un solo hilo, síncrono), desarrollo (carpetas `Models/Repositories/Services/Notifiers`)
+y física (Laravel + SQLite en un contenedor Docker). La clave a transmitir: **cada vista responde a la misma
 pregunta** ("¿cómo se resuelven los 3 casos de uso?") desde un ángulo distinto — no son 5 diagramas
 sueltos.
 
@@ -83,12 +83,14 @@ enfatiza que precisamente por eso puedes responder por el 100% de las decisiones
 cada commit del historial — nadie más tomó ninguna decisión que no puedas justificar tú mismo.
 Eso, bien presentado, es una fortaleza en la sustentación, no una debilidad.
 
-### 9. ¿Por qué no usaron una base de datos real?
+### 9. ¿Por qué SQLite y no MySQL o PostgreSQL?
 
 Decisión consciente de alcance: la docente pidió explícitamente no complicar el proyecto dado el
-tiempo disponible. El patrón Repository ya deja el punto de extensión listo — cambiar de arreglos
-en memoria a una base de datos real implicaría escribir una nueva implementación de
-`EquipoRepository`/`UsuarioRepository`/`PrestamoRepository`, sin tocar `GestorPrestamos` ni las
+tiempo disponible, y SQLite es la opción más simple que Laravel ofrece de forma nativa — un solo
+archivo, sin proceso de servidor aparte, sin usuario/contraseña que configurar. El patrón
+Repository ya deja el punto de extensión listo: si más adelante hiciera falta MySQL o Postgres,
+bastaría con cambiar la configuración de conexión y, si acaso, ajustar el detalle interno de
+`EquipoRepository`/`UsuarioRepository`/`PrestamoRepository` — sin tocar `GestorPrestamos` ni las
 reglas de negocio.
 
 ### 10. "Explícame esta línea de código" (pregunta genérica de defensa)

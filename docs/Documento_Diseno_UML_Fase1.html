@@ -5,83 +5,74 @@
 <meta name="color-scheme" content="light">
 <title>Documento de Diseño UML — Fase 1</title>
 <style>
-  @page { size: A4; margin: 20mm 18mm; }
+  @page { size: A4; margin: 25mm 25mm 20mm 30mm; }
   * { box-sizing: border-box; }
   html { color-scheme: light; background: #ffffff; }
   body {
-    font-family: 'Calibri', 'Segoe UI', Arial, sans-serif;
-    color: #222;
+    font-family: 'Times New Roman', Times, serif;
+    color: #000;
     background: #ffffff;
-    line-height: 1.45;
+    line-height: 1.5;
     max-width: 900px;
     margin: 0 auto;
     padding: 20px;
-    font-size: 15px;
+    font-size: 16px;
+    text-align: left;
   }
-  h1, h2, h3 { color: #7a1f2b; font-family: 'Cambria', Georgia, serif; }
-  h1 { font-size: 26px; border-bottom: 3px solid #7a1f2b; padding-bottom: 8px; }
-  h2 { font-size: 20px; margin-top: 40px; border-bottom: 1px solid #ccc; padding-bottom: 4px; }
-  h3 { font-size: 16px; margin-top: 22px; }
+  h1, h2, h3 { color: #7a1f2b; font-family: 'Times New Roman', Times, serif; font-weight: bold; text-align: left; }
+  h1 { font-size: 20px; text-transform: uppercase; }
+  h2 { font-size: 17px; margin-top: 34px; }
+  h3 { font-size: 16px; margin-top: 20px; font-style: italic; color: #000; }
   .cover {
     text-align: center;
-    padding-top: 90px;
+    padding-top: 40px;
     page-break-after: always;
   }
-  .cover h1 { border: none; font-size: 30px; margin-bottom: 4px; }
-  .cover .subtitle { font-size: 18px; color: #444; margin-bottom: 50px; }
+  .cover .univ { font-size: 15px; }
+  .cover .facultad { font-size: 15px; margin-bottom: 60px; }
+  .cover h1 { font-size: 22px; margin-bottom: 6px; text-align: center; }
+  .cover .subtitle { font-size: 16px; color: #000; margin-bottom: 70px; }
+  .cover .titulo-proyecto { font-size: 18px; margin-top: 50px; font-weight: bold; }
+  .cover .subdominio { font-size: 15px; margin-top: 4px; margin-bottom: 90px; }
   .cover table {
-    margin: 40px auto 0 auto;
+    margin: 0 auto;
     border-collapse: collapse;
-    width: 90%;
+    width: 85%;
   }
-  .cover table td { border: 1px solid #ccc; padding: 10px 14px; text-align: left; font-size: 14px; }
-  .cover table td.k { background: #7a1f2b; color: #fff; font-weight: bold; width: 220px; }
-  .fill { background: #fff3cd; padding: 1px 6px; border: 1px dashed #b38600; font-style: italic; }
+  .cover table td { border: 1px solid #999; padding: 8px 12px; text-align: left; font-size: 14px; }
+  .cover table td.k { background: #7a1f2b; color: #fff; font-weight: bold; width: 180px; }
+  .fill { font-style: italic; text-decoration: underline; }
   section { page-break-before: always; }
   section:first-of-type { page-break-before: auto; }
-  table.spec { border-collapse: collapse; width: 100%; margin: 14px 0 22px 0; font-size: 13.5px; }
-  table.spec th { background: #7a1f2b; color: #fff; padding: 8px; text-align: left; }
-  table.spec td { border: 1px solid #ddd; padding: 8px; vertical-align: top; }
-  table.spec tr:nth-child(even) td { background: #faf5f5; }
+  table.spec { border-collapse: collapse; width: 100%; margin: 14px 0 22px 0; font-size: 14px; text-align: left; }
+  table.spec th { border: 1px solid #999; background: #7a1f2b; color: #fff; padding: 6px 8px; text-align: left; font-weight: bold; }
+  table.spec td { border: 1px solid #999; padding: 6px 8px; vertical-align: top; text-align: left; }
   .diagram-box { text-align: center; margin: 18px 0; page-break-inside: avoid; }
-  .diagram-box svg { max-width: 100%; height: auto; border: 1px solid #e2c9cc; border-radius: 4px; }
-  .caption { font-size: 13px; color: #555; font-style: italic; margin-top: 6px; }
-  ul, ol { margin: 8px 0; padding-left: 26px; }
+  .diagram-box svg { max-width: 100%; height: auto; }
+  .caption { font-size: 14px; color: #000; font-style: italic; margin-top: 6px; text-align: center; }
+  ul, ol { margin: 8px 0; padding-left: 26px; text-align: left; }
   li { margin-bottom: 4px; }
-  .note {
-    background: #f7ecec;
-    border-left: 4px solid #7a1f2b;
-    padding: 10px 14px;
-    margin: 14px 0;
-    font-size: 14px;
-  }
-  code { background: #f0f0f0; padding: 1px 5px; border-radius: 3px; font-size: 13px; }
-  .toc { margin-top: 30px; }
-  .toc a { color: #7a1f2b; text-decoration: none; }
-  .toc li { margin-bottom: 8px; }
-  footer { margin-top: 60px; font-size: 11px; color: #888; text-align: center; }
-  @media print {
-    .no-print { display: none; }
-  }
+  code { font-family: 'Courier New', monospace; font-size: 14px; }
+  footer { margin-top: 60px; font-size: 12px; color: #444; text-align: center; border-top: 1px solid #999; padding-top: 8px; }
 </style>
 </head>
 <body>
 
 <!-- ============ PORTADA ============ -->
 <div class="cover">
-  <div style="font-size:13px;color:#666;letter-spacing:1px;">UNIVERSIDAD ESPÍRITU SANTO — FACULTAD DE INGENIERÍA</div>
-  <div style="font-size:13px;color:#666;margin-bottom:30px;">Carrera de Ingeniería en Computación · Diseño de Software (UCOM0310) · PEL 3 – 2026</div>
+  <div class="univ">UNIVERSIDAD ESPÍRITU SANTO</div>
+  <div class="facultad">Facultad de Ingeniería — Carrera de Ingeniería en Computación<br>Diseño de Software (UCOM0310) · PEL 3 – 2026</div>
 
   <h1>Documento de Diseño UML</h1>
   <div class="subtitle">Fase 1 — Proyecto Integrador: Diseño de Software</div>
 
-  <div style="font-size:22px; color:#333; margin-top:60px; font-family: 'Cambria', Georgia, serif;">
+  <div class="titulo-proyecto">
     Sistema de Préstamo de Equipos Tecnológicos
   </div>
-  <div style="font-size:15px; color:#666; margin-top:6px;">Dominio D3 — Sistema de préstamo de recursos</div>
+  <div class="subdominio">Dominio D3 — Sistema de préstamo de recursos</div>
 
   <table>
-    <tr><td class="k">Estudiante</td><td><span class="fill">[Nombre completo del estudiante]</span></td></tr>
+    <tr><td class="k">Estudiante</td><td>roddytc</td></tr>
     <tr><td class="k">Docente</td><td>Victoria García Velásquez, MGP.</td></tr>
     <tr><td class="k">Modalidad</td><td>Individual (registrado bajo el dominio D3)</td></tr>
     <tr><td class="k">Entrega</td><td>Fase 1 — Fin de semana 7</td></tr>
@@ -142,22 +133,24 @@ de confirmar un préstamo.
 <p>La organización de módulos del código base (Fase 2) refleja directamente la vista lógica, separando
 responsabilidades para facilitar las refactorizaciones de la Fase 3:</p>
 <ul>
-  <li><code>src/models/</code> — entidades de dominio (<code>Usuario</code>, <code>Equipo</code>, <code>Prestamo</code>) y sus enumeraciones de estado.</li>
-  <li><code>src/repositories/</code> — almacenamiento en memoria de cada entidad, detrás de una interfaz simple (<code>buscar</code>/<code>guardar</code>/<code>listar</code>).</li>
-  <li><code>src/services/</code> — <code>GestorPrestamos</code>, que orquesta los 3 casos de uso.</li>
-  <li><code>src/notifiers/</code> — interfaz <code>NotificadorAtraso</code> y su implementación <code>ConsolaNotificador</code>.</li>
-  <li><code>tests/</code> — pruebas unitarias (Jest) de cada caso de uso.</li>
+  <li><code>app/Models/</code> — entidades de dominio (<code>Usuario</code>, <code>Equipo</code>, <code>Prestamo</code>) como modelos Eloquent, y sus enumeraciones de estado en <code>app/Enums/</code>.</li>
+  <li><code>app/Repositories/</code> — abstraen el acceso a cada entidad detrás de una interfaz simple (<code>buscar</code>/<code>guardar</code>/<code>listar</code>), aunque internamente usen Eloquent.</li>
+  <li><code>app/Services/</code> — <code>GestorPrestamos</code>, que orquesta los 3 casos de uso.</li>
+  <li><code>app/Notifiers/</code> — interfaz <code>NotificadorAtraso</code> y su implementación <code>ConsolaNotificador</code>.</li>
+  <li><code>tests/Feature/</code> — pruebas unitarias (PHPUnit) de cada caso de uso y del patrón Observer.</li>
 </ul>
-<p>La dependencia siempre apunta hacia adentro: <code>services</code> depende de los contratos de
-<code>repositories</code> y <code>notifiers</code>, nunca al revés.</p>
+<p>La dependencia siempre apunta hacia adentro: <code>Services</code> depende de los contratos de
+<code>Repositories</code> y <code>Notifiers</code>, nunca al revés.</p>
 
 <h3>1.5 Vista Física</h3>
 <p>
-El despliegue es intencionalmente simple: <strong>un único proceso Node.js/TypeScript ejecutándose en
-una sola máquina</strong>, con persistencia en memoria (arreglos) para esta entrega. No hay servidor de
-base de datos, ni componentes distribuidos, ni dependencias de red — decisión consciente para cumplir
-con la indicación de la docente de mantener el sistema sencillo mientras se conserva la coherencia del
-diseño orientado a objetos.
+El despliegue es intencionalmente simple: <strong>PHP 8.3 con Laravel, corriendo en un contenedor
+Docker</strong>, con <strong>SQLite</strong> (un único archivo local) como persistencia — sin
+servidor de base de datos independiente, sin componentes distribuidos, sin dependencias de red.
+Usar Docker evita instalar PHP, Composer o Laravel directamente en la máquina de desarrollo; usar
+SQLite evita levantar un motor de base de datos aparte. Es la misma decisión de fondo que en las
+demás vistas: mantener el sistema sencillo, tal como pidió la docente, sin sacrificar la coherencia
+del diseño orientado a objetos.
 </p>
 </section>
 
@@ -392,7 +385,7 @@ entidades de dominio, repositorios y el servicio de coordinación:</p>
 <tr><td><strong>Equipo</strong></td><td>Representa un recurso prestable; conoce su propio estado (disponible, prestado, dañado).</td></tr>
 <tr><td><strong>Prestamo</strong></td><td>Representa la transacción de préstamo; calcula si está atrasado y gestiona su propio cierre.</td></tr>
 <tr><td><strong>GestorPrestamos</strong></td><td>Orquesta los 3 casos de uso; es el único punto de entrada a la lógica de negocio.</td></tr>
-<tr><td><strong>UsuarioRepository / EquipoRepository / PrestamoRepository</strong></td><td>Abstraen el almacenamiento de cada entidad (Repository pattern), permitiendo cambiar de memoria a una base de datos real sin tocar <code>GestorPrestamos</code>.</td></tr>
+<tr><td><strong>UsuarioRepository / EquipoRepository / PrestamoRepository</strong></td><td>Abstraen el acceso a cada entidad (Repository pattern) por encima de Eloquent, permitiendo cambiar el motor de base de datos sin tocar <code>GestorPrestamos</code>.</td></tr>
 <tr><td><strong>NotificadorAtraso</strong> (interfaz) / <strong>ConsolaNotificador</strong> (implementación)</td><td>Desacoplan la notificación de atrasos del resto del sistema (patrón Observer, justificado en la sección 5).</td></tr>
 </table>
 
