@@ -23,4 +23,9 @@ class Equipo extends Model
         $this->estado = $estado;
         $this->save();
     }
+
+    public function registrarDevolucion(bool $danado): void
+    {
+        $this->cambiarEstado($danado ? EstadoEquipo::DANADO : EstadoEquipo::DISPONIBLE);
+    }
 }

@@ -69,7 +69,7 @@ class GestorPrestamos
 
         $prestamo->registrarDevolucion();
 
-        $prestamo->equipo->cambiarEstado($danado ? EstadoEquipo::DANADO : EstadoEquipo::DISPONIBLE);
+        $prestamo->equipo->registrarDevolucion($danado);
 
         if ($prestamo->estaAtrasado()) {
             $this->notificarAtraso($prestamo);
