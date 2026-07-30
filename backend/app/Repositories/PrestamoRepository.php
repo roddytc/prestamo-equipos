@@ -6,16 +6,14 @@ use App\Enums\EstadoPrestamo;
 use App\Models\Prestamo;
 use Illuminate\Database\Eloquent\Collection;
 
-class PrestamoRepository
+/**
+ * @extends Repository<Prestamo>
+ */
+class PrestamoRepository extends Repository
 {
-    public function buscar(int $id): ?Prestamo
+    protected function modelo(): string
     {
-        return Prestamo::find($id);
-    }
-
-    public function guardar(Prestamo $prestamo): void
-    {
-        $prestamo->save();
+        return Prestamo::class;
     }
 
     public function listar(): Collection

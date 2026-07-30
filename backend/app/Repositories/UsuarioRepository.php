@@ -4,15 +4,13 @@ namespace App\Repositories;
 
 use App\Models\Usuario;
 
-class UsuarioRepository
+/**
+ * @extends Repository<Usuario>
+ */
+class UsuarioRepository extends Repository
 {
-    public function buscar(int $id): ?Usuario
+    protected function modelo(): string
     {
-        return Usuario::find($id);
-    }
-
-    public function guardar(Usuario $usuario): void
-    {
-        $usuario->save();
+        return Usuario::class;
     }
 }

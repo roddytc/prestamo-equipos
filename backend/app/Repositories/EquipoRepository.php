@@ -4,15 +4,13 @@ namespace App\Repositories;
 
 use App\Models\Equipo;
 
-class EquipoRepository
+/**
+ * @extends Repository<Equipo>
+ */
+class EquipoRepository extends Repository
 {
-    public function buscar(int $id): ?Equipo
+    protected function modelo(): string
     {
-        return Equipo::find($id);
-    }
-
-    public function guardar(Equipo $equipo): void
-    {
-        $equipo->save();
+        return Equipo::class;
     }
 }
