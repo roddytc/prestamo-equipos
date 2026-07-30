@@ -10,6 +10,7 @@ proyectores, cámaras). Trabajo individual, registrado bajo el dominio D3.
 |---|---|
 | [docs/Documento_Diseno_UML_Fase1.pdf](docs/Documento_Diseno_UML_Fase1.pdf) | Fase 1: enfoque 4+1, casos de uso, clases, secuencias, patrón Observer |
 | [docs/Informe_Malos_Olores_Fase2.pdf](docs/Informe_Malos_Olores_Fase2.pdf) | Fase 2: 5 malos olores diagnosticados con ubicación y justificación |
+| [docs/Informe_Refactorizacion_Fase3.pdf](docs/Informe_Refactorizacion_Fase3.pdf) | Fase 3: 6 refactorizaciones (4 niveles) con antes/después, commit y diagrama de clases actualizado |
 | [docs/especificacion_casos_uso.md](docs/especificacion_casos_uso.md) | Flujos y reglas de negocio de los 3 casos de uso |
 
 ## Stack
@@ -74,8 +75,8 @@ prestamo-equipos/
     ├── app/
     │   ├── Models/             # Usuario, Equipo, Prestamo (Eloquent)
     │   ├── Enums/               # RolUsuario, EstadoEquipo, EstadoPrestamo
-    │   ├── Repositories/        # UsuarioRepository, EquipoRepository, PrestamoRepository
-    │   ├── Services/            # GestorPrestamos (orquesta los 3 casos de uso)
+    │   ├── Repositories/        # Repository (base, Fase 3) + UsuarioRepository, EquipoRepository, PrestamoRepository
+    │   ├── Services/            # GestorPrestamos, SolicitudPrestamo (Fase 3), OperacionInvalidaException
     │   ├── Notifiers/           # NotificadorAtraso (interfaz), ConsolaNotificador, LogNotificador — patrón Observer
     │   └── Http/Controllers/    # PrestamoController — capa fina de API para demos (no evaluada)
     ├── routes/api.php           # POST /prestamos, POST /prestamos/{id}/devolucion, GET /prestamos/activos
@@ -94,4 +95,4 @@ prestamo-equipos/
 
 - ✅ Fase 1 — Documento de diseño UML
 - ✅ Fase 2 — Código base funcional, 15 pruebas en verde, informe de malos olores
-- ⏳ Fase 3 — Refactorización (semana 8), cubriendo los 4 niveles a partir de los 5 malos olores ya diagnosticados
+- ✅ Fase 3 — 6 refactorizaciones (Métodos, Clases y objetos, Condicionales, Datos), un commit por cada una, 15 pruebas en verde antes y después, diagrama de clases actualizado

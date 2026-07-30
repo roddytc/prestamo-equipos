@@ -110,3 +110,16 @@ negocio real sigue viviendo exclusivamente en `GestorPrestamos` — el controlad
 decide nada por su cuenta. De paso agrega `LogNotificador`, una segunda implementación de
 `NotificadorAtraso` (ver pregunta 2) que demuestra en código real la promesa de extensibilidad del
 patrón Observer.
+
+### 12. ¿Cómo elegiste esas 6 refactorizaciones de Fase 3 y no otras?
+
+No se eligieron al azar: son, una a una, los 5 malos olores que ya habían quedado documentados con
+archivo/línea en el informe de diagnóstico de Fase 2, más una extensión natural que surgió durante
+el propio proceso (mover el cambio de estado del equipo hacia `Equipo::registrarDevolucion()`, nivel
+Clases y objetos). Esto es intencional y vale la pena decirlo así en la sustentación: **el
+diagnóstico de Fase 2 y la refactorización de Fase 3 no son dos entregas independientes, son la
+misma historia contada en dos partes** — primero se encontró el problema con evidencia real, después
+se corrigió con una técnica de nombre reconocible (Extract Method, Move Method, Replace Parameter
+with Explicit Methods, Introduce Parameter Object, Extract Superclass), un commit por técnica, y las
+mismas 15 pruebas en verde antes y después de cada una. El detalle completo (antes/después,
+justificación, commit) está en `docs/Informe_Refactorizacion_Fase3.pdf`.

@@ -147,9 +147,11 @@ otro motor con una sintaxis distinta, **solo se toca el repositorio**, nunca `Ge
 sus pruebas. `PrestamoRepository` además tiene `listar()` (todos) y `listarActivos()` (solo los
 `estado = ACTIVO`, usado por UC3).
 
-Este es exactamente el mal olor #1 del informe de Fase 2: los tres repositorios son casi
-idénticos. Es un costo real y consciente — se aceptó la duplicación ahora a cambio de simplicidad,
-y se corrige en Fase 3.
+Este era exactamente el mal olor #1 del informe de Fase 2: los tres repositorios eran casi
+idénticos. **Se corrigió en Fase 3** (ver `docs/Informe_Refactorizacion_Fase3.pdf`): ahora
+`UsuarioRepository`, `EquipoRepository` y `PrestamoRepository` extienden una clase base
+`Repository<TModel>` que concentra `buscar()`/`guardar()`; cada subclase solo declara
+`protected function modelo(): string` con su modelo concreto.
 
 ---
 
@@ -187,30 +189,35 @@ Eloquent, que es justo lo que se quiere evitar.
 
 ## 7. GestorPrestamos — el recorrido completo de cada caso de uso
 
-**`registrarPrestamo(usuarioId, equipoId, dias)`**
-1. Busca ambas entidades por id (`$this->usuarios->buscar(...)`, `$this->equipos->buscar(...)`).
-2. Si alguna no existe → excepción.
-3. Si el usuario no puede solicitar (`puedeSolicitarPrestamo()`) → excepción.
-4. Si el equipo no está disponible (`estaDisponible()`) → excepción.
-5. Calcula `fechaPrestamo = hoy` y `fechaDevEsperada = hoy + dias` (`Carbon::today()->copy()->addDays($dias)`).
-6. Crea el `Prestamo` (estado `ACTIVO`) y lo guarda vía el repositorio.
-7. Cambia el equipo a `PRESTADO`.
-8. Devuelve el préstamo creado.
+> **Actualizado en Fase 3.** Las firmas y la organización interna cambiaron respecto a como se
+> describen en la Figura 3/4 del documento de diseño (Fase 1) — el comportamiento observable es
+> exactamente el mismo, solo cambió cómo está organizado el código por dentro. El detalle de cada
+> cambio, con antes/después y justificación, está en `docs/Informe_Refactorizacion_Fase3.pdf`.
 
-Esto es exactamente la Figura 3 del documento de diseño (el `ref` de "Validar Disponibilidad" son
-los pasos 1-4; el bloque `alt` son los pasos 5-8 contra el `else` de las excepciones).
+**`registrarPrestamo(SolicitudPrestamo $solicitud)`**
+1. Busca ambas entidades por id (`$this->usuarios->buscar($solicitud->usuarioId)`, ídem equipo).
+2. `$this->rechazarSi(...)` — tres validaciones (no encontrado / usuario no habilitado / equipo no
+   disponible), cada una una sola línea gracias al guard clause extraído en Fase 3.
+3. Delega la construcción a `$this->crearPrestamo($usuario, $equipo, $solicitud->dias)` (método
+   privado, también extraído en Fase 3): calcula fechas, crea y guarda el `Prestamo`, cambia el
+   equipo a `PRESTADO`, y retorna el préstamo.
 
-**`registrarDevolucion(prestamoId, danado = false)`**
-1. Busca el préstamo; si no existe o ya no está `ACTIVO` → excepción (cubre "no existe" y "ya
-   devuelto" con una sola condición: `$prestamo->estado !== EstadoPrestamo::ACTIVO`).
-2. Llama a `$prestamo->registrarDevolucion()` (el método del modelo — pone fecha real y estado
-   `DEVUELTO`).
-3. Según `$danado`, cambia el equipo a `DANADO` o `DISPONIBLE`.
-4. Pregunta `$prestamo->estaAtrasado()` — como ya se seteó `fecha_dev_real` en el paso 2, esta
-   pregunta compara esa fecha real contra la esperada.
-5. Si estaba atrasado, notifica a los observadores.
+Esto sigue siendo, en esencia, la Figura 3 del documento de diseño (el `ref` de "Validar
+Disponibilidad" son los pasos 1-2; el bloque `alt` corresponde a `crearPrestamo()` contra el `else`
+de las excepciones) — solo que ahora cada responsabilidad vive en su propio método.
 
-Esto es la Figura 4: el `alt [danado]` es el paso 3, el `opt [estaAtrasado()]` es los pasos 4-5.
+**`registrarDevolucionOk(int $prestamoId)` / `registrarDevolucionConDano(int $prestamoId)`**
+
+Antes había un solo método `registrarDevolucion($id, $danado = false)`; en Fase 3 se reemplazó el
+parámetro booleano por dos métodos explícitos, ambos delegando a un `procesarDevolucion()` privado:
+1. Busca el préstamo; `rechazarSi()` cubre "no existe" y "ya devuelto" en una sola condición.
+2. `$prestamo->registrarDevolucion()` (método del modelo — pone fecha real y estado `DEVUELTO`).
+3. `$prestamo->equipo->registrarDevolucion($danado)` — desde Fase 3, es el propio `Equipo` quien
+   decide su estado final (`DANADO`/`DISPONIBLE`), no `GestorPrestamos`.
+4. Si `$prestamo->estaAtrasado()`, notifica a los observadores.
+
+Esto sigue siendo la Figura 4: el `alt [danado]` ahora vive dentro de `Equipo::registrarDevolucion()`
+en vez de en `GestorPrestamos`; el `opt [estaAtrasado()]` son los pasos 3-4 de arriba.
 
 **`listarPrestamosActivos()`** — un solo `return`, delega directo al repositorio.
 
