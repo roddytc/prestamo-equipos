@@ -37,7 +37,9 @@ class PrestamoController extends Controller
         $danado = $request->boolean('danado');
 
         try {
-            $prestamo = $this->gestor->registrarDevolucion($id, $danado);
+            $prestamo = $danado
+                ? $this->gestor->registrarDevolucionConDano($id)
+                : $this->gestor->registrarDevolucionOk($id);
         } catch (OperacionInvalidaException $e) {
             return response()->json(['error' => $e->getMessage()], 422);
         }

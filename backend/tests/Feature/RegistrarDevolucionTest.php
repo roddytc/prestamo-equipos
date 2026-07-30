@@ -59,7 +59,7 @@ class RegistrarDevolucionTest extends TestCase
         $observador->shouldNotReceive('notificar');
         $this->gestor->agregarObservador($observador);
 
-        $resultado = $this->gestor->registrarDevolucion($prestamo->id, danado: false);
+        $resultado = $this->gestor->registrarDevolucionOk($prestamo->id);
 
         $this->assertSame(EstadoPrestamo::DEVUELTO, $resultado->estado);
         $this->assertSame(EstadoEquipo::DISPONIBLE, $prestamo->equipo->fresh()->estado);
@@ -71,7 +71,7 @@ class RegistrarDevolucionTest extends TestCase
     {
         $prestamo = $this->crearPrestamoActivo(Carbon::now()->addDays(3));
 
-        $this->gestor->registrarDevolucion($prestamo->id, danado: true);
+        $this->gestor->registrarDevolucionConDano($prestamo->id);
 
         $this->assertSame(EstadoEquipo::DANADO, $prestamo->equipo->fresh()->estado);
     }
@@ -89,7 +89,7 @@ class RegistrarDevolucionTest extends TestCase
         $this->gestor->agregarObservador($observadorUno);
         $this->gestor->agregarObservador($observadorDos);
 
-        $this->gestor->registrarDevolucion($prestamo->id);
+        $this->gestor->registrarDevolucionOk($prestamo->id);
 
         Carbon::setTestNow();
     }
@@ -101,6 +101,6 @@ class RegistrarDevolucionTest extends TestCase
 
         $this->expectException(OperacionInvalidaException::class);
 
-        $this->gestor->registrarDevolucion($prestamo->id);
+        $this->gestor->registrarDevolucionOk($prestamo->id);
     }
 }

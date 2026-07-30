@@ -61,7 +61,17 @@ class GestorPrestamos
         return $prestamo;
     }
 
-    public function registrarDevolucion(int $prestamoId, bool $danado = false): Prestamo
+    public function registrarDevolucionOk(int $prestamoId): Prestamo
+    {
+        return $this->procesarDevolucion($prestamoId, danado: false);
+    }
+
+    public function registrarDevolucionConDano(int $prestamoId): Prestamo
+    {
+        return $this->procesarDevolucion($prestamoId, danado: true);
+    }
+
+    private function procesarDevolucion(int $prestamoId, bool $danado): Prestamo
     {
         $prestamo = $this->prestamos->buscar($prestamoId);
 
