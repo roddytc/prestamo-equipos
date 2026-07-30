@@ -12,6 +12,7 @@ use App\Repositories\PrestamoRepository;
 use App\Repositories\UsuarioRepository;
 use App\Services\GestorPrestamos;
 use App\Services\OperacionInvalidaException;
+use App\Services\SolicitudPrestamo;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Tests\TestCase;
@@ -38,7 +39,7 @@ class RegistrarPrestamoTest extends TestCase
         $usuario = Usuario::create(['nombre' => 'Ana', 'rol' => RolUsuario::ESTUDIANTE, 'habilitado' => true]);
         $equipo = Equipo::create(['nombre' => 'Proyector Epson', 'categoria' => 'Proyector', 'estado' => EstadoEquipo::DISPONIBLE]);
 
-        $prestamo = $this->gestor->registrarPrestamo($usuario->id, $equipo->id, 7);
+        $prestamo = $this->gestor->registrarPrestamo(new SolicitudPrestamo($usuario->id, $equipo->id, 7));
 
         $this->assertSame(EstadoPrestamo::ACTIVO, $prestamo->estado);
         $this->assertSame(EstadoEquipo::PRESTADO, $equipo->fresh()->estado);
@@ -52,7 +53,7 @@ class RegistrarPrestamoTest extends TestCase
         $this->expectException(OperacionInvalidaException::class);
 
         try {
-            $this->gestor->registrarPrestamo($usuario->id, $equipo->id, 7);
+            $this->gestor->registrarPrestamo(new SolicitudPrestamo($usuario->id, $equipo->id, 7));
         } finally {
             $this->assertSame(0, \App\Models\Prestamo::count());
             $this->assertSame(EstadoEquipo::DISPONIBLE, $equipo->fresh()->estado);
@@ -66,7 +67,7 @@ class RegistrarPrestamoTest extends TestCase
 
         $this->expectException(OperacionInvalidaException::class);
 
-        $this->gestor->registrarPrestamo($usuario->id, $equipo->id, 7);
+        $this->gestor->registrarPrestamo(new SolicitudPrestamo($usuario->id, $equipo->id, 7));
     }
 
     public function test_rechaza_si_el_equipo_esta_danado(): void
@@ -76,7 +77,7 @@ class RegistrarPrestamoTest extends TestCase
 
         $this->expectException(OperacionInvalidaException::class);
 
-        $this->gestor->registrarPrestamo($usuario->id, $equipo->id, 7);
+        $this->gestor->registrarPrestamo(new SolicitudPrestamo($usuario->id, $equipo->id, 7));
     }
 
     public function test_calcula_la_fecha_de_devolucion_esperada_segun_los_dias_indicados(): void
@@ -86,7 +87,7 @@ class RegistrarPrestamoTest extends TestCase
         $usuario = Usuario::create(['nombre' => 'Ana', 'rol' => RolUsuario::ESTUDIANTE, 'habilitado' => true]);
         $equipo = Equipo::create(['nombre' => 'Laptop HP', 'categoria' => 'Laptop', 'estado' => EstadoEquipo::DISPONIBLE]);
 
-        $prestamo = $this->gestor->registrarPrestamo($usuario->id, $equipo->id, 5);
+        $prestamo = $this->gestor->registrarPrestamo(new SolicitudPrestamo($usuario->id, $equipo->id, 5));
 
         $this->assertTrue($prestamo->fecha_dev_esperada->isSameDay(Carbon::parse('2026-07-29')));
 
@@ -97,6 +98,6 @@ class RegistrarPrestamoTest extends TestCase
     {
         $this->expectException(OperacionInvalidaException::class);
 
-        $this->gestor->registrarPrestamo(999, 999, 7);
+        $this->gestor->registrarPrestamo(new SolicitudPrestamo(999, 999, 7));
     }
 }

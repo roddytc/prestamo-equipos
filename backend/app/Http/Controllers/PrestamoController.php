@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Notifiers\LogNotificador;
 use App\Services\GestorPrestamos;
 use App\Services\OperacionInvalidaException;
+use App\Services\SolicitudPrestamo;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -24,7 +25,11 @@ class PrestamoController extends Controller
         ]);
 
         try {
-            $prestamo = $this->gestor->registrarPrestamo($data['usuario_id'], $data['equipo_id'], $data['dias']);
+            $prestamo = $this->gestor->registrarPrestamo(new SolicitudPrestamo(
+                usuarioId: $data['usuario_id'],
+                equipoId: $data['equipo_id'],
+                dias: $data['dias'],
+            ));
         } catch (OperacionInvalidaException $e) {
             return response()->json(['error' => $e->getMessage()], 422);
         }

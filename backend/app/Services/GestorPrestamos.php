@@ -31,16 +31,16 @@ class GestorPrestamos
         $this->observadores[] = $notificador;
     }
 
-    public function registrarPrestamo(int $usuarioId, int $equipoId, int $dias): Prestamo
+    public function registrarPrestamo(SolicitudPrestamo $solicitud): Prestamo
     {
-        $usuario = $this->usuarios->buscar($usuarioId);
-        $equipo = $this->equipos->buscar($equipoId);
+        $usuario = $this->usuarios->buscar($solicitud->usuarioId);
+        $equipo = $this->equipos->buscar($solicitud->equipoId);
 
         $this->rechazarSi(! $usuario || ! $equipo, 'Usuario o equipo no encontrado.');
         $this->rechazarSi(! $usuario->puedeSolicitarPrestamo(), 'El usuario no esta habilitado para solicitar prestamos.');
         $this->rechazarSi(! $equipo->estaDisponible(), 'El equipo no esta disponible.');
 
-        return $this->crearPrestamo($usuario, $equipo, $dias);
+        return $this->crearPrestamo($usuario, $equipo, $solicitud->dias);
     }
 
     private function crearPrestamo(Usuario $usuario, Equipo $equipo, int $dias): Prestamo
