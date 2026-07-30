@@ -4,7 +4,9 @@ namespace App\Services;
 
 use App\Enums\EstadoEquipo;
 use App\Enums\EstadoPrestamo;
+use App\Models\Equipo;
 use App\Models\Prestamo;
+use App\Models\Usuario;
 use App\Notifiers\NotificadorAtraso;
 use App\Repositories\EquipoRepository;
 use App\Repositories\PrestamoRepository;
@@ -38,6 +40,11 @@ class GestorPrestamos
         $this->rechazarSi(! $usuario->puedeSolicitarPrestamo(), 'El usuario no esta habilitado para solicitar prestamos.');
         $this->rechazarSi(! $equipo->estaDisponible(), 'El equipo no esta disponible.');
 
+        return $this->crearPrestamo($usuario, $equipo, $dias);
+    }
+
+    private function crearPrestamo(Usuario $usuario, Equipo $equipo, int $dias): Prestamo
+    {
         $fechaPrestamo = Carbon::today();
 
         $prestamo = new Prestamo([
