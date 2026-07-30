@@ -34,17 +34,9 @@ class GestorPrestamos
         $usuario = $this->usuarios->buscar($usuarioId);
         $equipo = $this->equipos->buscar($equipoId);
 
-        if (! $usuario || ! $equipo) {
-            throw new OperacionInvalidaException('Usuario o equipo no encontrado.');
-        }
-
-        if (! $usuario->puedeSolicitarPrestamo()) {
-            throw new OperacionInvalidaException('El usuario no esta habilitado para solicitar prestamos.');
-        }
-
-        if (! $equipo->estaDisponible()) {
-            throw new OperacionInvalidaException('El equipo no esta disponible.');
-        }
+        $this->rechazarSi(! $usuario || ! $equipo, 'Usuario o equipo no encontrado.');
+        $this->rechazarSi(! $usuario->puedeSolicitarPrestamo(), 'El usuario no esta habilitado para solicitar prestamos.');
+        $this->rechazarSi(! $equipo->estaDisponible(), 'El equipo no esta disponible.');
 
         $fechaPrestamo = Carbon::today();
 
@@ -66,9 +58,7 @@ class GestorPrestamos
     {
         $prestamo = $this->prestamos->buscar($prestamoId);
 
-        if (! $prestamo || $prestamo->estado !== EstadoPrestamo::ACTIVO) {
-            throw new OperacionInvalidaException('El prestamo no existe o ya fue cerrado.');
-        }
+        $this->rechazarSi(! $prestamo || $prestamo->estado !== EstadoPrestamo::ACTIVO, 'El prestamo no existe o ya fue cerrado.');
 
         $prestamo->registrarDevolucion();
 
@@ -99,6 +89,13 @@ class GestorPrestamos
     {
         foreach ($this->observadores as $observador) {
             $observador->notificar($prestamo);
+        }
+    }
+
+    private function rechazarSi(bool $condicion, string $mensaje): void
+    {
+        if ($condicion) {
+            throw new OperacionInvalidaException($mensaje);
         }
     }
 }
